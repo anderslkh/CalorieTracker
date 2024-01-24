@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Models
+﻿namespace Models
 {
     public class NutritionalTable
     {
-        public double EnergyKJ { get; set; } = -1;
-        public double EnergyKcal { get; set; } = -1;
-        public double Fat { get; set; } = -1;
-        public double FatSaturated { get; set; } = -1;
-        public double Carbohydrates { get; set; } = -1;
-        public double Sugars { get; set; } = -1;
-        public double DietaryFibers { get; set; } = -1;
-        public double Protein { get; set; } = -1;
-        public double Salt { get; set; } = -1;
+        public int Id { get; }
+        public float EnergyKJ { get; set; } = -1;
+        public float EnergyKcal { get; set; } = -1;
+        public float Fat { get; set; } = -1;
+        public float FatSaturated { get; set; } = -1;
+        public float Carbohydrates { get; set; } = -1;
+        public float Sugars { get; set; } = -1;
+        public float DietaryFibers { get; set; } = -1;
+        public float Protein { get; set; } = -1;
+        public float Salt { get; set; } = -1;
     }
 }
