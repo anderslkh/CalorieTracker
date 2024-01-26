@@ -17,15 +17,14 @@ namespace DataAccess
         public async Task<T?> LoadSingleData<T, U>(string sql, U parameters)
         {
             T? result;
+
             try
             {
                 string? connectionString = _config.GetConnectionString(ConnectionStringName);
 
                 using SqlConnection connection = new(connectionString);
 
-                var data = await connection.QueryFirstOrDefaultAsync<T>(sql, parameters);
-
-                result = data;
+                result = await connection.QueryFirstOrDefaultAsync<T>(sql, parameters);
             }
             catch (Exception e)
             {
@@ -45,9 +44,7 @@ namespace DataAccess
 
                 using SqlConnection connection = new(connectionString);
 
-                var data = await connection.QueryAsync<T>(sql, parameters);
-
-                result = data.ToList();
+                result = (await connection.QueryAsync<T>(sql, parameters)).ToList();
             }
             catch (Exception e)
             {
@@ -57,7 +54,7 @@ namespace DataAccess
             return result;
         }
 
-        public async Task<int> SaveData<T>(string sql, T parameters)
+        public async Task<int> EditData<T>(string sql, T parameters)
         {
             int result = 0;
 
@@ -67,9 +64,27 @@ namespace DataAccess
 
                 using SqlConnection connection = new(connectionString);
 
-                var data = await connection.ExecuteAsync(sql, parameters);
+                result = await connection.ExecuteAsync(sql, parameters);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
 
-                result = data;
+            return result;
+        }
+
+        public async Task<int> CreateData<T>(string sql, T parameters)
+        {
+            int result = 0;
+
+            try
+            {
+                string? connectionString = _config.GetConnectionString(ConnectionStringName);
+
+                using SqlConnection connection = new(connectionString);
+
+                result = await connection.ExecuteScalarAsync<int>(sql, parameters);
             }
             catch (Exception e)
             {

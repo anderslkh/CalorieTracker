@@ -1,3 +1,4 @@
+using API.DataAccess;
 using DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //Dependency Injection
-builder.Services.AddTransient<ISqlDataAccess, ISqlDataAccess>();
+builder.Services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+builder.Services.AddTransient<INutritionalTableDao, NutritionalTableDao>();
 
 var app = builder.Build();
 
