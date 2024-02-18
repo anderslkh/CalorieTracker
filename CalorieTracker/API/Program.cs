@@ -12,7 +12,7 @@ builder.Services.AddSwaggerGen();
 
 //Dependency Injection
 builder.Services.AddTransient<ISqlDataAccess, SqlDataAccess>();
-builder.Services.AddTransient<INutritionalTableDao, NutritionalTableDao>();
+//builder.Services.AddTransient<INutritionalTableDao, NutritionalTableDao>();
 
 var app = builder.Build();
 

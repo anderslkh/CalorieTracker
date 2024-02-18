@@ -1,41 +1,56 @@
-﻿using DataAccess;
+﻿using Dapper;
 using Models;
+using System.Data.SqlClient;
 
 namespace API.DataAccess
 {
-    public class NutritionalTableDao : INutritionalTableDao
+    public class NutritionalTableDao : IDao<NutritionalTable, int>
     {
-        private readonly ISqlDataAccess _db;
-        public NutritionalTableDao(ISqlDataAccess db)
+        private readonly SqlConnection _db;
+        public NutritionalTableDao(SqlConnection db)
         {
             _db = db;
         }
 
-        public async Task<NutritionalTable> GetNutritionalTableById(int Id)
+        public async Task<NutritionalTable> GetItemById(int id)
         {
             string query =
-                "SELECT Id, Energy_KJ, Energy_Kcal, Fat, Fat_Saturated, Carbohydrates, Sugars, Dietary_Fibers, Protein, Salt where Id = @Id";
+                "SELECT Id, Energy_KJ, Energy_Kcal, Fat, Fat_Saturated, Carbohydrates, Sugars, Dietary_Fibers, Protein, Salt " +
+                "FROM Nutritional_Table " +
+                "WHERE Id = @Id";
 
-            return await _db.LoadSingleData<NutritionalTable, dynamic>(query, new { Id });
+            return await _db.QuerySingleAsync<NutritionalTable>(query, new { Id = id });
         }
 
-        //public Task<List<NutritionalTable>> GetAllNutritionalTables()
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public async Task<List<NutritionalTable>> GetAllItems()
+        {
+            List<NutritionalTable> nutritionalTables = null;
 
-        public async Task<int> CreateNutritionalTable(NutritionalTable nutritionalTable)
+            string query =
+                "SELECT * " +
+                "FROM Nutritional_Table";
+
+            nutritionalTables = (await _db.QueryAsync<NutritionalTable>(query)).ToList();
+
+            return nutritionalTables;
+        }
+
+        public async Task<int> CreateItem(NutritionalTable nutritionalTable)
         {
             string query =
                 "INSERT INTO Nutritional_Table (Energy_KJ, Energy_Kcal, Fat, Fat_Saturated, Carbohydrates, Sugars, Dietary_Fibers, Protein, Salt) " +
-                "VALUES(@EnergyKJ, @EnergyKcal, @Fat, @FatSaturated, @Carbohydrates, @Sugars, @DietaryFibers, @Protein, @Salt) " +
-                "SELECT SCOPE_IDENTITY()";
+                "OUTPUT INSERTED.Id " +
+                "VALUES(@EnergyKJ, @EnergyKcal, @Fat, @FatSaturated, @Carbohydrates, @Sugars, @DietaryFibers, @Protein, @Salt)";
 
-            return await _db.CreateData(query, nutritionalTable);
+            var result = await _db.ExecuteScalarAsync<int>(query, nutritionalTable);
+
+            return result;
         }
 
-        public async Task<bool> UpdateNutritionalTable(NutritionalTable nutritionalTable)
+        public async Task<bool> UpdateItem(NutritionalTable nutritionalTable, int id)
         {
+            int result = -1;
+
             string query =
                 "UPDATE Nutritional_Table " +
                 "SET Energy_KJ = @EnergyKJ, " +
@@ -49,18 +64,33 @@ namespace API.DataAccess
                 "Salt = @Salt " +
                 "WHERE Id = @Id";
 
-            int result = await _db.EditData(query, nutritionalTable);
+            var param = new
+            {
+                Id = id,
+                nutritionalTable.EnergyKJ,
+                nutritionalTable.EnergyKcal,
+                nutritionalTable.Fat,
+                nutritionalTable.FatSaturated,
+                nutritionalTable.Carbohydrates,
+                nutritionalTable.Sugars,
+                nutritionalTable.DietaryFibers,
+                nutritionalTable.Protein,
+                nutritionalTable.Salt
+            };
+
+            result = await _db.ExecuteAsync(query, param);
 
             return result > 0;
         }
 
-        public async Task<bool> DeleteNutritionalTableById(int id)
+        public async Task<bool> DeleteItem(int id)
         {
+            int result = -1;
             string query =
                 "DELETE FROM Nutritional_Table " +
                 "WHERE Id = @Id";
 
-            int result = await _db.EditData(query, new { id });
+            result = await _db.ExecuteAsync(query, new { id });
 
             return result > 0;
         }
